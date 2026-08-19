@@ -1,10 +1,5 @@
-/**
- * 认证相关接口。
- *
- * 当前使用假数据模拟,接真实后端时:
- * 把这里的实现换成 api() 调用即可(见 src/lib/api.ts),
- * 函数签名和类型保持不变,组件层无需改动。
- */
+import { api } from '@/lib/api'
+
 export interface LoginPayload {
   username: string
   password: string
@@ -13,58 +8,87 @@ export interface LoginPayload {
 
 export interface RegisterPayload {
   username: string
-  email: string
   password: string
+  phone: string
+}
+
+/** 后端统一响应结构 */
+export interface ApiResponse<T> {
+  code: number
+  message: string
+  data: T
+}
+
+export interface User {
+  userId: number
+  createdAt: string
+  updatedAt: string
+  username: string
+  loginChannel: number
+  unionId: string
+  openId: string
+  alipayUid: string
+  nickname: string
+  phone: string
+  email: string
+  avatar: string
+  gender: number
+  status: number
+  lastLoginIp: string
+  lastLoginAt: string
+}
+
+interface LoginData {
+  token: string
+  user: User
 }
 
 export interface AuthResult {
   token: string
   username: string
+  user: User
 }
 
-/** 模拟网络延迟 */
-function delay(ms = 800) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-/** 已注册的假账号,密码统一为 123456 */
-const DEMO_USERS = [
-  { username: 'demo', email: 'demo@example.com', password: '123456' },
-  { username: 'admin', email: 'admin@example.com', password: '123456' },
-]
-
-function fakeToken(username: string) {
-  return btoa(`fake-token:${username}:${Date.now()}`)
+/** 解包统一响应结构,code !== 0 视为业务错误 */
+async function unwrap<T>(promise: Promise<ApiResponse<T>>): Promise<T> {
+  const res = await promise
+  if (res.code !== 0) {
+    throw new Error(res.message || '请求失败')
+  }
+  return res.data
 }
 
 export async function login(payload: LoginPayload): Promise<AuthResult> {
-  // TODO: 接真实后端时替换为:
-  // return api<AuthResult>('/auth/login', {
-  //   method: 'POST',
-  //   body: JSON.stringify(payload),
-  // })
-  await delay()
-  const user = DEMO_USERS.find((u) => u.username === payload.username)
-  if (!user || user.password !== payload.password) {
-    throw new Error('用户名或密码错误')
+  const data = await unwrap(
+    api<ApiResponse<LoginData>>('/user/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: payload.username,
+        password: payload.password,
+      }),
+    }),
+  )
+  return {
+    token: data.token,
+    username: data.user.username,
+    user: data.user,
   }
-  return { token: fakeToken(user.username), username: user.username }
 }
 
 export async function register(payload: RegisterPayload): Promise<AuthResult> {
-  // TODO: 接真实后端时替换为:
-  // return api<AuthResult>('/auth/register', {
-  //   method: 'POST',
-  //   body: JSON.stringify(payload),
-  // })
-  await delay()
-  if (DEMO_USERS.some((u) => u.username === payload.username)) {
-    throw new Error('用户名已被占用')
+  const data = await unwrap(
+    api<ApiResponse<LoginData>>('/user/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: payload.username,
+        password: payload.password,
+        phone: payload.phone,
+      }),
+    }),
+  )
+  return {
+    token: data.token,
+    username: data.user.username,
+    user: data.user,
   }
-  DEMO_USERS.push({
-    username: payload.username,
-    email: payload.email,
-    password: payload.password,
-  })
-  return { token: fakeToken(payload.username), username: payload.username }
 }

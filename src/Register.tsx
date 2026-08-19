@@ -28,11 +28,11 @@ import { saveAuth } from '@/lib/auth'
 const registerSchema = z
   .object({
     username: z.string().trim().min(1, '请输入用户名'),
-    email: z
+    phone: z
       .string()
       .trim()
-      .min(1, '请输入邮箱')
-      .refine((v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), '邮箱格式不正确'),
+      .min(1, '请输入手机号')
+      .refine((v) => /^1\d{10}$/.test(v), '手机号格式不正确'),
     password: z.string().min(6, '密码至少 6 位'),
     confirm: z.string().min(1, '请再次输入密码'),
     agreed: z.boolean().refine((v) => v, '请先阅读并同意服务条款'),
@@ -55,7 +55,7 @@ function Register({ onSuccess }: RegisterProps) {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: '',
-      email: '',
+      phone: '',
       password: '',
       confirm: '',
       agreed: false,
@@ -68,7 +68,7 @@ function Register({ onSuccess }: RegisterProps) {
     try {
       const result = await register({
         username: values.username,
-        email: values.email,
+        phone: values.phone,
         password: values.password,
       })
       // 注册成功即视为登录
@@ -119,17 +119,18 @@ function Register({ onSuccess }: RegisterProps) {
               />
 
               <Controller
-                name="email"
+                name="phone"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="email">邮箱</FieldLabel>
+                    <FieldLabel htmlFor="phone">手机号</FieldLabel>
                     <Input
                       {...field}
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      autoComplete="email"
+                      id="phone"
+                      type="tel"
+                      placeholder="请输入手机号"
+                      autoComplete="tel"
+                      maxLength={11}
                       aria-invalid={fieldState.invalid}
                     />
                     <FieldError errors={[fieldState.error]} />
