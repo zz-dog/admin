@@ -56,8 +56,9 @@ jobs:
           container_port="${CONTAINER_PORT:-8080}"
           mkdir -p ~/.ssh
           printf '%s\n' "$SERVER_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          ssh -p "$port" "$SERVER_USER@$SERVER_HOST" "mkdir -p '$DEPLOY_PATH'"
-          rsync -az --delete -e "ssh -p $port" dist Containerfile nginx.conf "$SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/"
+          # 增加-v调试ssh连通
+          ssh -v -p "$port" "$SERVER_USER@$SERVER_HOST" "mkdir -p '$DEPLOY_PATH'"
+          rsync -azv --delete -e "ssh -p $port" dist Containerfile nginx.conf "$SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/"
           ssh -p "$port" "$SERVER_USER@$SERVER_HOST" \
             "podman build -t '$container_name:$COMMIT_SHA' -t '$container_name:latest' '$DEPLOY_PATH' && \
              (podman rm -f '$container_name' || true) && \
