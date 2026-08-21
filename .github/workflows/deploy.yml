@@ -1,0 +1,65 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Bun modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun
+          key: bun-${{ hashFiles('bun.lockb') }}
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Deploy with Podman
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          SERVER_KNOWN_HOSTS: ${{ secrets.SERVER_KNOWN_HOSTS }}
+          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          CONTAINER_PORT: ${{ secrets.CONTAINER_PORT }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -e
+          port="${SERVER_PORT:-22}"
+          container_name="${CONTAINER_NAME:-admin}"
+          container_port="${CONTAINER_PORT:-8080}"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SERVER_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -p "$port" "$SERVER_USER@$SERVER_HOST" "mkdir -p '$DEPLOY_PATH'"
+          rsync -az --delete -e "ssh -p $port" dist Containerfile nginx.conf "$SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/"
+          ssh -p "$port" "$SERVER_USER@$SERVER_HOST" \
+            "podman build -t '$container_name:$COMMIT_SHA' -t '$container_name:latest' '$DEPLOY_PATH' && \
+             (podman rm -f '$container_name' || true) && \
+             podman run -d --name '$container_name' --restart=always -p '$container_port:80' '$container_name:latest' && \
+             podman image prune -f"
