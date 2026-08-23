@@ -19,10 +19,6 @@ function Placeholder({ title }: { title: string }) {
   )
 }
 
-export function UsersPage() {
-  return <Placeholder title="用户管理" />
-}
-
 export function SettingsPage() {
   return <Placeholder title="设置" />
 }

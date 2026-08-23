@@ -1,4 +1,4 @@
-import { api } from '@/lib/api'
+import { api, unwrap, type ApiResponse } from '@/lib/api'
 
 export interface LoginPayload {
   username: string
@@ -10,13 +10,6 @@ export interface RegisterPayload {
   username: string
   password: string
   phone: string
-}
-
-/** 后端统一响应结构 */
-export interface ApiResponse<T> {
-  code: number
-  message: string
-  data: T
 }
 
 export interface User {
@@ -47,15 +40,6 @@ export interface AuthResult {
   token: string
   username: string
   user: User
-}
-
-/** 解包统一响应结构,code !== 0 视为业务错误 */
-async function unwrap<T>(promise: Promise<ApiResponse<T>>): Promise<T> {
-  const res = await promise
-  if (res.code !== 0) {
-    throw new Error(res.message || '请求失败')
-  }
-  return res.data
 }
 
 export async function login(payload: LoginPayload): Promise<AuthResult> {
