@@ -6,8 +6,10 @@ import Register from "./Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import ProductCategoryPage from "./pages/ProductCategory";
+import ProductsPage from "./pages/Products";
+import SpecsPage from "./pages/Specs";
 import UsersPage from "./pages/Users";
-import { SettingsPage } from "./pages/Placeholder";
+import { Placeholder, SettingsPage } from "./pages/Placeholder";
 
 function App() {
   return (
@@ -32,6 +34,18 @@ function App() {
           <Route
             path="product/category"
             element={<ProductCategoryPage />}
+          />
+          <Route
+            path="product/spec"
+            element={<SpecsPage />}
+          />
+          <Route
+            path="product/list"
+            element={<ProductsPage />}
+          />
+          <Route
+            path="product/brand"
+            element={<Placeholder title="商品品牌" />}
           />
         </Route>
       </Route>

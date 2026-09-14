@@ -4,6 +4,7 @@ import {
   LayoutDashboardIcon,
   PackageIcon,
   SettingsIcon,
+  SlidersHorizontalIcon,
   TagsIcon,
   UsersIcon,
   type LucideIcon,
@@ -27,6 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { title: "商品列表", url: "/product/list", icon: ListIcon },
       { title: "商品分类", url: "/product/category", icon: TagsIcon },
+      { title: "商品规格", url: "/product/spec", icon: SlidersHorizontalIcon },
       { title: "商品品牌", url: "/product/brand", icon: BadgeIcon },
     ],
   },

@@ -3,9 +3,9 @@ import {
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-} from '@/components/ui/empty'
+} from "@/components/ui/empty";
 
-function Placeholder({ title }: { title: string }) {
+export function Placeholder({ title }: { title: string }) {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">{title}</h1>
@@ -16,9 +16,9 @@ function Placeholder({ title }: { title: string }) {
         </EmptyHeader>
       </Empty>
     </div>
-  )
+  );
 }
 
 export function SettingsPage() {
-  return <Placeholder title="设置" />
+  return <Placeholder title="设置" />;
 }
