@@ -49,7 +49,7 @@ export interface BindSpecParams {
 
 /** 获取全量分类列表 */
 export async function findAllCategories(): Promise<Category[]> {
-  return unwrap(api<ApiResponse<Category[]>>("/category/findAll"));
+  return unwrap(api<ApiResponse<Category[]>>("/catalog/category/findAll"));
 }
 
 /** 创建分类 */
@@ -57,7 +57,7 @@ export async function createCategory(
   params: CreateCategoryParams,
 ): Promise<void> {
   await unwrap(
-    api<ApiResponse<void>>("/category/create", {
+    api<ApiResponse<void>>("/catalog/category/create", {
       method: "POST",
       body: JSON.stringify(params),
     }),
@@ -70,7 +70,7 @@ export async function updateCategory(
   params: UpdateCategoryParams,
 ): Promise<Category> {
   return unwrap(
-    api<ApiResponse<Category>>(`/category/${categoryId}`, {
+    api<ApiResponse<Category>>(`/catalog/category/${categoryId}`, {
       method: "PUT",
       body: JSON.stringify(params),
     }),
@@ -80,7 +80,7 @@ export async function updateCategory(
 /** 删除分类 */
 export async function deleteCategory(categoryId: number): Promise<void> {
   await unwrap(
-    api<ApiResponse<void>>(`/category/${categoryId}`, {
+    api<ApiResponse<void>>(`/catalog/category/${categoryId}`, {
       method: "DELETE",
     }),
   );
@@ -91,14 +91,16 @@ export async function findCategorySpecs(
   categoryId: number,
 ): Promise<CategorySpec[]> {
   return unwrap(
-    api<ApiResponse<CategorySpec[]>>(`/category/findSpecs/${categoryId}`),
+    api<ApiResponse<CategorySpec[]>>(
+      `/catalog/category/findSpecs/${categoryId}`,
+    ),
   );
 }
 
 /** 绑定规格到分类(重复绑定返回错误) */
 export async function bindSpec(params: BindSpecParams): Promise<CategorySpec> {
   return unwrap(
-    api<ApiResponse<CategorySpec>>("/category/bindSpec", {
+    api<ApiResponse<CategorySpec>>("/catalog/category/bindSpec", {
       method: "POST",
       body: JSON.stringify(params),
     }),
@@ -115,8 +117,11 @@ export async function unbindSpec(
     specId: String(specId),
   });
   await unwrap(
-    api<ApiResponse<void>>(`/category/unbindSpec?${search.toString()}`, {
-      method: "DELETE",
-    }),
+    api<ApiResponse<void>>(
+      `/catalog/category/unbindSpec?${search.toString()}`,
+      {
+        method: "DELETE",
+      },
+    ),
   );
 }

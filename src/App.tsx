@@ -5,9 +5,9 @@ import Login from "./Login";
 import Register from "./Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
-import ProductCategoryPage from "./pages/ProductCategory";
-import ProductsPage from "./pages/Products";
-import SpecsPage from "./pages/Specs";
+import ProductCategoryPage from "./pages/product/category/ProductCategory";
+import ProductsPage from "./pages/product/products/Products";
+import SpecsPage from "./pages/product/specs/Specs";
 import UsersPage from "./pages/Users";
 import { Placeholder, SettingsPage } from "./pages/Placeholder";
 

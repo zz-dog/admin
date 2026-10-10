@@ -80,10 +80,13 @@ export async function listProducts(
   if (params.name) search.set("name", params.name);
 
   return unwrap(
-    api<ApiResponse<ProductListData>>(`/product/list?${search.toString()}`, {
-      method: "POST",
-      signal: params.signal,
-    }),
+    api<ApiResponse<ProductListData>>(
+      `/catalog/product/list?${search.toString()}`,
+      {
+        method: "POST",
+        signal: params.signal,
+      },
+    ),
   );
 }
 
@@ -91,7 +94,7 @@ export async function createProduct(
   params: CreateProductParams,
 ): Promise<Product> {
   return unwrap(
-    api<ApiResponse<Product>>("/product/create", {
+    api<ApiResponse<Product>>("/catalog/product/create", {
       method: "POST",
       body: JSON.stringify(params),
     }),
@@ -102,7 +105,7 @@ export async function updateProduct(
   params: UpdateProductParams,
 ): Promise<Product> {
   return unwrap(
-    api<ApiResponse<Product>>("/product/update", {
+    api<ApiResponse<Product>>("/catalog/product/update", {
       method: "POST",
       body: JSON.stringify(params),
     }),
